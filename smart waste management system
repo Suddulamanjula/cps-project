@@ -1,0 +1,67 @@
+Here is a basic code for a smart waste management system using Arduino:
+
+Sensor Node Code:
+
+c++
+const int sensorPin = A0;  // Ultrasonic sensor pin
+const int ledPin = 13;     // LED indicator pin
+
+void setup() {
+  pinMode(sensorPin, INPUT);
+  pinMode(ledPin, OUTPUT);
+}
+
+void loop() {
+  int sensorValue = analogRead(sensorPin);
+  int wasteLevel = map(sensorValue, 0, 1023, 0, 100);  // Map sensor value to waste level (0-100%)
+  
+  if (wasteLevel > 75) {  // If waste level exceeds 75%
+    digitalWrite(ledPin, HIGH);  // Turn on LED indicator
+  } else {
+    digitalWrite(ledPin, LOW);  // Turn off LED indicator
+  }
+  
+  // Send waste level data to gateway via serial communication
+  Serial.println(wasteLevel);
+  delay(1000);  // Send data every 1 second
+}
+
+
+Gateway Code:
+
+c++
+const int rxPin = 0;  // Serial receive pin
+const int txPin = 1;  // Serial transmit pin
+
+void setup() {
+  Serial.begin(9600);  // Initialize serial communication
+}
+
+void loop() {
+  if (Serial.available() > 0) {  // If data received from sensor node
+    int wasteLevel = Serial.parseInt();  // Parse waste level data
+    // Send waste level data to web-based dashboard via Wi-Fi or cellular connectivity
+    // ...
+  }
+}
+
+
+Web-Based Dashboard Code (using Python and Flask):
+
+from flask import Flask, request, jsonify
+import serial
+
+app = Flask(_name_)
+
+# Initialize serial communication with gateway
+ser = serial.Serial('COM3', 9600)
+
+@app.route('/waste-level', methods=['POST'])
+def update_waste_level():
+    waste_level = request.get_json()['waste_level']
+    # Update waste level data in database
+    # ...
+    return jsonify({'success': True})
+
+if _name_ == '_main_':
+    app.run(debug=True)
